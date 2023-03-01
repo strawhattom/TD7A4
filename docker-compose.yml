@@ -1,0 +1,38 @@
+# Version 
+version: '3'
+
+services:
+  database:
+    image: mongo:latest
+    container_name: 'mongodb'
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/testdb
+    # keep data 
+    volumes:
+      - flask_mongo:/data/db
+    networks:
+      - td5_cloud
+    ports:
+      - 27017
+  app:
+    container_name: 'flask_app'
+    build: .
+    # bind mount a file
+    volumes:
+      - type: bind
+        source: ./static/content.txt
+        target: /usr/src/app/static/content.txt
+    networks:
+      - td5_cloud
+    depends_on:
+      - database
+    ports:
+      - '5000:5000'
+
+networks:
+  td5_cloud:
+    driver: bridge
+
+volumes:
+  flask_mongo:
+    external: true
